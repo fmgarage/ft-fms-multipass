@@ -8,4 +8,4 @@ All our **FileMaker**-based projects and products are prefixed with an **F** and
 
 [Browse all our FT repos](https://github.com/fmgarage?q=ft-)
 
-If you are looking for other ways to run a FileMaker Server for Linux, check out our :[regarding repos](https://github.com/fmgarage?q=ft-fms-).
+If you are looking for other ways to run a FileMaker Server for Linux, check out our [regarding repos](https://github.com/fmgarage?q=ft-fms-).
