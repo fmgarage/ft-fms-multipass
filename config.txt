@@ -1,0 +1,36 @@
+# download URL for the fms install package. Only needed when local file is not found.
+url=
+
+# multipass instance name
+instance_name=fms-1
+
+# Number of CPUs to allocate. Default 1.
+cpus=
+
+# Additional disk space to allocate. Positive integers, as GB. Adds to the 5GB default size.
+add_disk=
+
+# Amount of memory to allocate. Positive integers as GB. Default: 1.
+mem=
+
+# ssh public key for sftp access
+#   macOS example:
+#     ssh_pub_key_path=/Users/nancy/.ssh/id_rsa.pub
+#   Windows example:
+#     ssh_pub_key_path=/mnt/c/Users/nancy/.ssh/id_rsa.pub
+ssh_pub_key_path=
+
+# settings for FileMaker Server assisted installation
+[Assisted Install]
+
+License Accepted=1
+
+Deployment Options=0
+
+Admin Console User=admin
+
+Admin Console Password=admin
+
+Admin Console PIN=1111
+
+License Certificate Path=/home/ubuntu/LicenseCert.fmcert
