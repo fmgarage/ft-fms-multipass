@@ -2,7 +2,13 @@
 :experimental:
 :hide-uri-scheme:
 
+* <<About>>
+* <<Installation on macOS>>
+* <<Installation on Windows 10>>
+* <<Administration>>
+* <<Issues>>
 
+== About
 
 Run FileMaker Server 19.3 for Ubuntu in Multipass for Mac or Windows. Everything you need to automatically build a ready-to-run Instance.
 
@@ -15,14 +21,13 @@ On the other hand, with multipass, it is possible to run multiple FileMaker Serv
 .What does 'FT' stand for?
 All our **FileMaker**-based projects and products are prefixed with an **F**, and the **T** is for **tools, technology, tipps&tricks, techniques** or open **templates** for the community. These files are basically examples and demonstrations where you can copy stuff from and include it your individual apps and solutions.
 
-Browse all our FT repos: https://github.com/fmgarage?q=ft-
+Browse all our FT repos:
 
-If you are looking for other ways to run a FileMaker Server for Linux, check out our regarding repos: https://github.com/fmgarage?q=ft-fms-
+https://github.com/fmgarage?q=ft-
 
+If you are looking for other ways to run a FileMaker Server for Linux, check out our regarding repos:
 
-* <<Installation on macOS>>
-* <<Installation on Windows 10>>
-* <<Administration>>
+https://github.com/fmgarage?q=ft-fms-
 
 == Installation on macOS
 
@@ -173,22 +178,6 @@ Mind that:
 
 Clicking `Open Shell` from the Multipass menu will open a terminal window where you can use the fmsadmin command to control your server.
 
-=== Issues:
-
-We have experienced situations where multipass could not start up anymore. These situations where probably caused by stopping, deleting and purging instances to fast successively. This is also the reason why the reboot option has been taken out of the cloud-config. The following issue might be related and also contains a workaround to handle this:
-
-https://github.com/canonical/multipass/issues/1983
-
-Resources for any created instance cannot be altered afterwards.
-
-https://github.com/canonical/multipass/issues/62
-
-In Windows, IP addresses of instances change randomly after Windows reboot. Find the current IP with
-
-    multipass ls
-
-https://github.com/canonical/multipass/issues/1293
-
 == Administration
 
 === Stopping and Restarting the Server
@@ -228,3 +217,19 @@ really remove deleted instances:
 Find more at the official Multipass Docs:
 
 https://multipass.run/docs
+
+== Issues
+
+We have experienced situations where multipass could not start up anymore. These situations where probably caused by stopping, deleting and purging instances to fast successively. This is also the reason why the reboot option has been taken out of the cloud-config. The following issue might be related and also contains a workaround to handle this:
+
+https://github.com/canonical/multipass/issues/1983
+
+Resources for any created instance cannot be altered afterwards.
+
+https://github.com/canonical/multipass/issues/62
+
+In Windows, IP addresses of instances change randomly after Windows reboot. Find the current IP with
+
+    multipass ls
+
+https://github.com/canonical/multipass/issues/1293
