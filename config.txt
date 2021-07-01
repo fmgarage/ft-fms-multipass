@@ -2,18 +2,18 @@
 url=
 
 # multipass instance name
-instance_name=fms-1
+instance_name=fms-a
 
 # Number of CPUs to allocate. Default 1.
 cpus=
 
-# Additional disk space to allocate. Positive integers, as GB. Adds to the 5GB default size.
+# Additional disk space to allocate. Positive integers as GB. Adds to the 1 GB free space when left empty.
 add_disk=
 
 # Amount of memory to allocate. Positive integers as GB. Default: 1.
 mem=
 
-# ssh public key for sftp access
+# Path to SSH public key for key-based SFTP access. Can be empty.
 #   macOS example:
 #     ssh_pub_key_path=/Users/nancy/.ssh/id_rsa.pub
 #   Windows example:

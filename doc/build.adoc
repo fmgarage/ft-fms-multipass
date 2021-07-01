@@ -1,0 +1,16 @@
+=== Build and run Instance
+
+Open Terminal.app, drag the `launch.sh` into the terminal window and hit return.
+
+After the installation process is finished, the IP of the instance will be printed out by the script.
+Also check the multipass menu, there should be a running instance named like set in `config.txt`.
+
+Open the admin console by browsing to with `\https://<IP_from_output>:16000`.
+
+Mind that:
+
+* *Chrome* does not work without a valid certificate
+* *Safari* lets you bypass the certificate warning
+* *Edge* lets you bypass the certificate warning, but you need to append `https://`.
+
+Clicking `Open Shell` from the Multipass menu will open a terminal window where you can use the fmsadmin command to control your server.

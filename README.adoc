@@ -3,16 +3,17 @@
 :hide-uri-scheme:
 
 
+
 Run FileMaker Server 19.3 for Ubuntu in Multipass for Mac or Windows. Everything you need to automatically build a ready-to-run Instance.
 
 We are constantly improving the scripts and try to get rid of the remaining issues. If you want to stay up-to-date, make sure to watch the repo and maybe follow us on Twitter: https://twitter.com/fmgarage[@fmgarage]
 
-TIP: Also see https://github.com/fmgarage/ft-fms-docker[ft-fms-docker], our approach to run FileMaker Server in Docker. While Multipass is even more lightweight and a little easier to use due to its focused nature, it is not yet as mature as Docker and still yields some bugs and missing features. +
+TIP: Also see https://github.com/fmgarage/ft-fms-docker[ft-fms-docker], our approach to run FileMaker Server in Docker. While Multipass is even more lightweight, and a little easier to use due to its focused nature, it is not yet as mature as Docker and still yields some bugs and missing features. +
 The mount of external volumes for example doesn't handle ownership mapping the way it should, so FileMaker Server directories must be accessed via SFTP instead. +
 On the other hand, with multipass, it is possible to run multiple FileMaker Servers in parallel.
 
 .What does 'FT' stand for?
-All our **FileMaker**-based projects and products are prefixed with an **F** and the **T** is for **tools, technology, tipps&tricks, techniques** or open **templates** for the community. These files are basically examples and demonstrations where you can copy stuff from and include it your individual apps and solutions.
+All our **FileMaker**-based projects and products are prefixed with an **F**, and the **T** is for **tools, technology, tipps&tricks, techniques** or open **templates** for the community. These files are basically examples and demonstrations where you can copy stuff from and include it your individual apps and solutions.
 
 Browse all our FT repos: https://github.com/fmgarage?q=ft-
 
@@ -21,7 +22,6 @@ If you are looking for other ways to run a FileMaker Server for Linux, check out
 
 * <<Installation on macOS>>
 * <<Installation on Windows 10>>
-* <<Tools>>
 * <<Administration>>
 
 == Installation on macOS
@@ -40,7 +40,7 @@ Download a copy of the FileMaker Server installer for Linux from your Claris acc
 
 === SSH key pair generation
 
-If you don't already have a public/private ssh key pair, you will need to create one. With the following command, a key pair is generated and saved to your home directory in the `.ssh` folder:
+If you want to connect to the instance's filesystem without a password, and you don't already have a public/private ssh key pair, you will need to create one. With the following command, a key pair gets generated and saved to your home directory in the `.ssh` folder:
 
     ssh-keygen -t rsa -b 4096
 
@@ -52,30 +52,30 @@ Adjust settings in `config.txt`
 
     instance_name=fms1
 
-- Set resources for the instance. These cannot be changed once the instance has been created, so a little planning ahead is required. Diskspace is added to the default space of 5GB. Leave empty for default values.
+- Set resources for the instance. Leave empty for default values.
 
-IMPORTANT: These cannot be changed once the instance has been created, so a little planning ahead is required. Diskspace (`add_disk`) is added to the default space of 5GB.
+include::doc/admo_disk.adoc[]
 
     cpus=1
     add_disk=2
     mem=2
 
-- Set path to ssh public key. Required for SFTP file access.
+- Set path to ssh public key for key-based SFTP file access. Leave empty for password authentication.
 
     ssh_pub_key_path=/Users/nancy/.ssh/id_rsa.pub
 
-You can adjust the settings for the _Assisted Install.txt_ file in the `config.txt` but you don't need to. The server admin console login will be admin/admin then, which can be changed later.
+You can adjust the settings for the _Assisted Install.txt_ file in the `config.txt`, but you don't need to. The server admin console login will be admin/admin then, which can be changed later.
 
-// include::doc/build.adoc[]
+//include::doc/build.adoc[]
 
 === Build and run Instance
 
 Open Terminal.app, drag the `launch.sh` into the terminal window and hit return.
 
-After the installation process is finished, the IP of the instance will be printed out by the script.
+After the installation process finishes, the IP of the instance will be printed out by the script.
 Also check the multipass menu, there should be a running instance named like set in `config.txt`.
 
-Open the admin console by browsing to with \*https://<IP_from_output>:16000*
+Open the admin console by browsing to with `\https://<IP_from_output>:16000`
 
 Mind that:
 
@@ -113,7 +113,7 @@ and then starting Ubuntu again.
 
 === Multipass
 
-Download and install Multipass and make sure it is is running: https://multipass.run
+Download and install Multipass and make sure it is running: https://multipass.run
 
 === Repo
 
@@ -125,7 +125,7 @@ Download a copy of the FileMaker Server installer for Linux from your Claris acc
 
 === SSH key pair generation
 
-If you do not already have a public/private ssh key pair, you will need to create one. With the following command, a key pair is generated and saved to your home directory in the `.ssh` folder:
+If you want to connect to the instance's filesystem without a password, and you don't already have a public/private ssh key pair, you will need to create one. With the following command, a key pair gets generated and saved to your home directory in the `.ssh` folder:
 
     ssh-keygen -t rsa -b 4096
 
@@ -141,17 +141,17 @@ Adjust settings in `config.txt`
 
 - Set resources for the instance. Leave empty for default values.
 
-IMPORTANT: These cannot be changed once the instance has been created, so a little planning ahead is required. Diskspace (`add_disk`) is added to the default space of 5GB.
+include::doc/admo_disk.adoc[]
 
     cpus=1
     add_disk=2
     mem=2
 
-- Set path to ssh public key. Required for SFTP file access.
+- Set path to ssh public key for key-based SFTP file access. Leave empty for password authentication.
 
     ssh_pub_key_path=/mnt/c/Users/nancy/.ssh/id_rsa.pub
 
-You can adjust the settings for the _Assisted Install.txt_ file in the `config.txt` but you don't need to. The server admin console login will be admin/admin then, which can be changed later.
+You can adjust the settings for the _Assisted Install.txt_ file in the `config.txt`, but you don't need to. The server admin console login will be admin/admin then, which can be changed later.
 
 === Run install script
 
@@ -161,10 +161,10 @@ In Ubuntu shell, run the installer from the folder where you put the repository:
 /mnt/c/Users/<User>/Downloads/ft-fms-multipass/launch.sh
 ----
 
-After the installation process is finished, the IP of the instance will be printed out by the script.
+After the installation process finishes, the IP of the instance will be printed out by the script.
 Or/Also check the multipass menu in the Taskbar, there should be a running instance named like set in `config.txt`.
 
-Open the admin console by browsing to with \*https://<IP_from_output>:16000*
+Open the admin console by browsing to with `\https://<IP_from_output>:16000`
 
 Mind that:
 
@@ -207,4 +207,24 @@ The FileMaker Server directory inside the multipass instance is `/opt/FileMaker/
 
 === Managing Instances
 
-Type `multipass list` in Terminal to show instances.
+Some multipass commands that might be useful:
+
+show instances, including IP address:
+
+    multipass ls
+
+stop instance:
+
+    multipass stop <instance-name>
+
+delete instance:
+
+    multipass delete <instance-name>
+
+really remove deleted instances:
+
+    multipass purge
+
+Find more at the official Multipass Docs:
+
+https://multipass.run/docs

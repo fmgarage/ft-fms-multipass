@@ -8,7 +8,7 @@ if [ -n "$wsl" ]; then
 fi
 
 # go to working dir
-printf "go to working directory...\n"
+printf "\n \e[36m go to working directory... \e[39m\n"
 pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || {
     printf "error while determining work directory\n"
     exit 1
@@ -18,13 +18,12 @@ cd "$pwd" || {
     exit 1
   }
 
-# parse config
 source "$pwd"/common/settings.sh
+source "$pwd"/common/instance.sh
 
 # get settings from config
 # todo not found
-printf "get config...\n"
-
+printf "\n \e[36m get config... \e[39m\n"
 instance=$(get_setting "instance_name" ./config.txt)
 cpus=$(get_setting "cpus" ./config.txt)
 if [ -z "$cpus" ];then
@@ -39,17 +38,25 @@ if [ -z "$mem" ];then
   mem=1
 fi
 
-pub_key_path=$(get_setting "ssh_pub_key_path" ./config.txt)
-pub_key=$(cat "${pub_key_path}") || {
-    printf "error while getting ssh pub key\n"
+pub_key_path=$(get_setting "ssh_pub_key_path" ./config.txt) || {
+    printf "error while getting ssh key path\n"
     exit 1
   }
+if [ -n "$pub_key_path" ]; then
+    pub_key=$(cat "${pub_key_path}") || {
+        printf "error while getting ssh pub key\n"
+        exit 1
+      }
+else
+  pub_key=""
+fi
+
 admin_user=$(get_setting "Admin Console User" ./config.txt)
 admin_pass=$(get_setting "Admin Console Password" ./config.txt)
 admin_pin=$(get_setting "Admin Console PIN" ./config.txt)
 license=$(get_setting "License Certificate Path" ./config.txt)
 
-printf "checking config...\n"
+printf "\n \e[36m checking config... \e[39m\n"
 check_setting "$instance"
 check_setting "$cpus"
 check_integer "$cpus"
@@ -62,8 +69,7 @@ check_setting "$admin_pass"
 check_setting "$admin_pin"
 check_setting "$license"
 
-
-printf "write assisted_install.txt...\n"
+printf "\n \e[36m write assisted_install.txt... \e[39m\n"
 cat > assisted_install.txt <<EOF
 [Assisted Install]
 
@@ -80,8 +86,7 @@ Admin Console PIN=${admin_pin}
 License Certificate Path=${license}
 EOF
 
-
-printf "write cloud-config to init.yml...\n"
+printf "\n \e[36m write cloud-config to init.yml... \e[39m\n"
 cat > init.yml <<EOF
 #cloud-config
 users:
@@ -91,6 +96,8 @@ users:
     plain_text_passwd: 'fmserver'
     ssh_authorized_keys:
       - ${pub_key}
+ssh_pwauth: true
+chpasswd: { expire: False }
 output: {all: '| tee -a /var/log/cloud-init-output.log'}
 packages: []
 package_update: true
@@ -130,55 +137,86 @@ for option in $cpus $disk_space $mem; do
   launch_options+="${option} "
 done
 
-printf "launch multipass instance...\n"
-eval multipass launch "${launch_options}"--name "${instance}" --cloud-init init.yml 18.04 || {
-    printf "error while launching multipass instance\n"
-    exit 1
-  }
-
-printf "transfer assisted_install.txt...\n"
-multipass transfer assisted_install.txt "${instance}": || {
-    printf "error while transferring assisted_install.txt\n"
-    exit 1
-  }
-
-# download from URL if not found locally
+#find package/check url before launching instance
 package=$(find . -name "*.deb")
 if [[ ! $package ]]; then
-  printf "\ndownloading fms package ...\n"
+  printf "\n \e[36m no local package found, checking fms package url... \e[39m\n"
   url=$(get_setting "url" ./config.txt)
-  check_many "$url"
+  check_setting "$url"
   STATUS=$(curl -s --head --output /dev/null -w '%{http_code}' "$url")
   if [ ! "$STATUS" -eq 200 ]; then
-    echo "Error while downloading fms package: Got a $STATUS from URL: $url ..."
+    echo "Error while checking fms package URL: Got a $STATUS from: $url ..."
     exit 1
   fi
-    multipass exec "${instance}" -- wget "${url}" -O /home/ubuntu/fms.deb
-  # curl "${url}" -O || exit
-else
-  printf "Transferring install package...\n"
-  multipass transfer "${package}" "${instance}":/home/ubuntu/fms.deb || {
-    printf "error while transferring installer package\n"
-    exit 1
-  }
+  printf "\n \e[36m found package at URL. \e[39m\n"
+  package_url=1
 fi
 
-printf "Installing FileMaker Server...\n"
+printf "\n \e[36m launch multipass instance... \e[39m\n"
+eval multipass launch "${launch_options}"--name "${instance}" --cloud-init init.yml 18.04 || {
+    printf "error while launching multipass instance\n"
+    remove_instance "${instance}"
+    exit 1
+  }
+
+printf "\n \e[36m transfer assisted_install.txt... \e[39m\n"
+multipass transfer assisted_install.txt "${instance}": || {
+    printf "error while transferring assisted_install.txt\n"
+    remove_instance "${instance}"
+    exit 1
+  }
+
+# download from URL or transfer from local
+if [[ $package_url -eq 1 ]]; then
+  printf "\n \e[36m downloading fms package ... \e[39m\n"
+
+  multipass exec "${instance}" -- wget "${url}" -O /home/ubuntu/fms.deb
+  # curl "${url}" -O || exit
+elif [[ $package ]]; then
+  printf "\n \e[36m Transferring install package... \e[39m\n"
+
+  multipass transfer "${package}" "${instance}":/home/ubuntu/fms.deb || {
+    printf "error while transferring installer package\n"
+    remove_instance "${instance}"
+    exit 1
+  }
+else
+  printf "error while preparing installer package\n"
+  exit 1
+fi
+
+printf "\n \e[36m Installing FileMaker Server... \e[39m\n"
 multipass exec "${instance}" -- bash -c "sudo FM_ASSISTED_INSTALL=/home/ubuntu/assisted_install.txt apt install /home/ubuntu/fms.deb -y" || {
     printf "error while installing fmserver package\n"
+    remove_instance "${instance}"
     exit 1
   }
 multipass exec "${instance}" -- fmsadmin -u ${admin_user} -p ${admin_pass} set serverconfig SecureFilesOnly=false || {
     printf "error while setting SecureFileOnly\n"
+    remove_instance "${instance}"
     exit 1
   }
 multipass exec "${instance}" -- fmsadmin -u ${admin_user} -p ${admin_pass} -y disable schedule 1 || {
     printf "error while setting disable schedule\n"
+    remove_instance "${instance}"
     exit 1
   }
 
-printf "Restarting instance to finish installation...\n"
+# cleanup
+printf "\n \e[36m cleaning up... \e[39m\n"
+multipass exec "${instance}" -- rm -v /home/ubuntu/fms.deb || {
+    printf "error while removing deb package\n"
+    remove_instance "${instance}"
+    exit 1
+  }
+multipass exec "${instance}" -- bash -c "sudo apt clean && sudo apt autoremove --purge" || {
+    printf "error while apt cleanup\n"
+    remove_instance "${instance}"
+    exit 1
+  }
+
+printf "\n \e[36m Restarting instance to finish installation... \e[39m\n"
 multipass restart "${instance}"
 
-printf "Done. FileMaker Server is running at the following IP:\n"
+printf "\n \e[36m Done. FileMaker Server is running at the following IP: \e[39m\n"
 multipass info "${instance}" | grep IPv4

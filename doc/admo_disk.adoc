@@ -1,0 +1,2 @@
+IMPORTANT: These cannot be changed once the instance has been created, so a little planning ahead is required. Disk space (`add_disk`) gets added to the default space of 5 GB (which leaves ~1 GB free). +
+This is enough when testing a small solution of a few MB, when running a full-blown application with backups etc, more space should be assigned.
